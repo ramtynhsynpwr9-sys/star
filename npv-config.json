@@ -1,0 +1,96 @@
+{
+  "npv": {
+    "version": "1.0",
+    "mode": "gaming",
+    "protocol": "npv",
+    "inbounds": [
+      {
+        "port": 10808,
+        "protocol": "socks",
+        "auth": "noauth",
+        "udp": true
+      },
+      {
+        "port": 10809,
+        "protocol": "http"
+      }
+    ],
+    "outbounds": [
+      {
+        "name": "NPV-Proxy",
+        "protocol": "npv",
+        "settings": {
+          "server": "npv-server.example.com",
+          "port": 443,
+          "username": "your-username",
+          "password": "your-password",
+          "encryption": "aes-256-gcm"
+        },
+        "streamSettings": {
+          "network": "tcp",
+          "security": "tls",
+          "tlsSettings": {
+            "serverName": "npv-server.example.com",
+            "allowInsecure": false
+          }
+        }
+      },
+      {
+        "name": "Direct",
+        "protocol": "freedom"
+      },
+      {
+        "name": "Block",
+        "protocol": "blackhole"
+      }
+    ],
+    "routing": {
+      "domainStrategy": "IPOnDemand",
+      "rules": [
+        {
+          "type": "field",
+          "domain": ["geosite:ir"],
+          "outboundTag": "Direct"
+        },
+        {
+          "type": "field",
+          "ip": ["geoip:ir"],
+          "outboundTag": "Direct"
+        },
+        {
+          "type": "field",
+          "domain": ["pubg.com", "pubgmobile.com", "tencent.com"],
+          "outboundTag": "NPV-Proxy"
+        },
+        {
+          "type": "field",
+          "domain": [],
+          "outboundTag": "NPV-Proxy"
+        }
+      ]
+    },
+    "dns": {
+      "servers": [
+        "8.8.8.8",
+        "8.8.4.4",
+        "1.1.1.1"
+      ]
+    },
+    "stats": {},
+    "policy": {
+      "levels": {
+        "0": {
+          "statsUserUplink": true,
+          "statsUserDownlink": true
+        }
+      }
+    }
+  },
+  "gaming": {
+    "app": "PUBG",
+    "region": "Global",
+    "optimization": "low-latency",
+    "udp": true,
+    "ipv6": false
+  }
+}
